@@ -273,27 +273,73 @@ const nextRecommendationsButton = document.getElementById("nextRecommendations")
 const resultsInfo = document.getElementById("resultsInfo");
 const fallbackCover = "https://placehold.co/180x270/f3e4c6/13212b?text=Kein+Cover";
 const easterEggSequence = ["N", "O", "S", "W"];
+const easterEggBookEmojis = ["📕", "📗", "📘", "📙", "📚"];
 const secretExplorerBooks = [
   {
-    title: "Der Wolkenatlas",
-    author: "David Mitchell",
-    reason: "Verschachtelte Reisen durch Zeit, Identitaet und Schicksal.",
+    title: "Keeper of the Lost Cities",
+    reason: "Magische Geheimnisse, Freundschaft und eine Welt voller Entdeckungen.",
   },
   {
-    title: "Piranesi",
-    author: "Susanna Clarke",
-    reason: "Raetselhaft, poetisch und wie eine Entdeckung im Labyrinth.",
+    title: "Misfits Academy",
+    reason: "Perfekt fuer alle, die Chaos, Teamdynamik und eine besondere Schule moegen.",
   },
   {
-    title: "Die Stadt und die Stadt",
-    author: "China Mieville",
-    reason: "Ungewoehnlicher Mix aus Krimi, Idee und Weltbau.",
+    title: "Chaos Witches",
+    reason: "Hexen-Vibes, Tempo und genau die richtige Portion magisches Durcheinander.",
   },
 ];
 
 let recommendationPool = [];
 let currentOffset = 0;
 let secretKeyBuffer = [];
+let activeBookSwarm = null;
+
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
+async function runBookSwarm() {
+  if (activeBookSwarm) {
+    activeBookSwarm.remove();
+  }
+
+  const swarm = document.createElement("div");
+  swarm.className = "book-swarm";
+  swarm.setAttribute("aria-hidden", "true");
+
+  for (let index = 0; index < 10; index += 1) {
+    const emoji = document.createElement("span");
+    const emojiChar = easterEggBookEmojis[index % easterEggBookEmojis.length];
+    const verticalBand = 12 + (index % 5) * 14 + Math.random() * 6;
+    const delay = (index % 4) * 0.18 + Math.random() * 0.2;
+    const duration = 4.1 + Math.random() * 0.7;
+    const endYShift = `${Math.round((Math.random() - 0.5) * 90)}px`;
+    const endRotate = `${Math.round((Math.random() - 0.5) * 44)}deg`;
+    const emojiSize = `${2.8 + Math.random() * 1.4}rem`;
+
+    emoji.className = "book-swarm-emoji";
+    emoji.textContent = emojiChar;
+    emoji.style.setProperty("--start-y", `${verticalBand}vh`);
+    emoji.style.setProperty("--delay", `${delay.toFixed(2)}s`);
+    emoji.style.setProperty("--duration", `${duration.toFixed(2)}s`);
+    emoji.style.setProperty("--end-y-shift", endYShift);
+    emoji.style.setProperty("--end-rotate", endRotate);
+    emoji.style.setProperty("--emoji-size", emojiSize);
+    swarm.appendChild(emoji);
+  }
+
+  document.body.appendChild(swarm);
+  activeBookSwarm = swarm;
+
+  await wait(5000);
+
+  if (activeBookSwarm === swarm) {
+    swarm.remove();
+    activeBookSwarm = null;
+  }
+}
 
 function getAgeProfile(age) {
   if (age <= 10) {
@@ -390,16 +436,19 @@ function buildRecommendationPool(genre, ageProfile) {
 }
 
 function getBuyUrl(book) {
-  const query = encodeURIComponent(`${book.title} ${book.author}`);
+  const query = encodeURIComponent([book.title, book.author].filter(Boolean).join(" "));
   return `https://www.thalia.de/suche?sq=${query}`;
 }
 
 async function fetchCoverUrl(book) {
   const params = new URLSearchParams({
     title: book.title,
-    author: book.author,
     limit: "1",
   });
+
+  if (book.author) {
+    params.set("author", book.author);
+  }
 
   try {
     const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
@@ -436,11 +485,12 @@ async function renderBooks(books) {
     const item = document.createElement("li");
     item.className = "book-item";
     item.style.animationDelay = `${index * 90}ms`;
+    const authorLine = book.author ? `<div class="book-meta">von ${book.author}</div>` : "";
     item.innerHTML = `
       <img class="book-cover" src="${book.coverUrl}" alt="Buchcover von ${book.title}" loading="lazy" />
       <div class="book-content">
         <div class="book-title">${book.title}</div>
-        <div class="book-meta">von ${book.author}</div>
+        ${authorLine}
         <div class="book-meta">${book.reason}</div>
         <a class="buy-link" href="${book.buyUrl}" target="_blank" rel="noopener noreferrer">Buch kaufen</a>
       </div>
@@ -475,6 +525,9 @@ async function activateExplorerMode() {
   recommendationPool = [];
   currentOffset = 0;
   nextRecommendationsButton.hidden = true;
+  recommendations.innerHTML = "<li class=\"book-meta\">Buchschwarm wird gestartet...</li>";
+  resultsInfo.textContent = "Easter Egg gefunden: Die Buecher sind unterwegs.";
+  await runBookSwarm();
   recommendations.innerHTML = "<li class=\"book-meta\">Entdecker-Modus wird geladen...</li>";
   await renderBooks(secretExplorerBooks);
   resultsInfo.textContent = "Easter Egg gefunden: Entdecker-Modus (N-O-S-W) ist aktiv.";
