@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BuchKompass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Merriweather:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles_clean.css" />
+  </head>
+  <body>
+    <!-- Artistic watercolor background -->
+    <div class="gradient-bg"></div>
+    
+    <!-- Floating book elements -->
+    <div class="floating-books">
+      <div class="book book-1"></div>
+      <div class="book book-2"></div>
+      <div class="book book-3"></div>
+    </div>
+    
+
+    <main class="app">
+      <header class="hero">
+        <p class="eyebrow">Finde deinen naechsten Lieblingsread</p>
+        <h1>BuchKompass</h1>
+        <p>
+          Neu hier? Kein Stress. Gib kurz dein Alter und dein Lieblings-Genre an
+          und wir zeigen dir direkt 3 Buchempfehlungen, die zu dir passen.
+        </p>
+      </header>
+
+      <section class="card">
+        <form id="bookForm" class="form" novalidate>
+          <label for="age">Wie alt bist du?</label>
+          <input
+            id="age"
+            name="age"
+            type="number"
+            min="6"
+            max="120"
+            placeholder="z. B. 17"
+            required
+          />
+
+          <label for="genre">Worauf hast du gerade Lust?</label>
+          <select id="genre" name="genre" required>
+            <option value="">Genre auswaehlen</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="sci-fi">Science-Fiction</option>
+            <option value="krimi">Krimi/Thriller</option>
+            <option value="romance">Romance</option>
+            <option value="sachbuch">Sachbuch</option>
+          </select>
+
+          <button type="submit">Zeig mir 3 Vorschlaege</button>
+          <p id="error" class="error" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="results" aria-live="polite">
+        <h2 id="resultsTitle">Deine Vorschlaege</h2>
+        <ul id="recommendations" class="book-list"></ul>
+        <button id="nextRecommendations" class="next-button" type="button" hidden>
+          Mehr Vorschlaege anzeigen
+        </button>
+        <p id="resultsInfo" class="results-info" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
