@@ -334,7 +334,7 @@ async function runBookSwarm() {
   document.body.appendChild(swarm);
   activeBookSwarm = swarm;
 
-  await wait(5000);
+  await wait(4800);
 
   if (activeBookSwarm === swarm) {
     swarm.remove();
@@ -524,15 +524,20 @@ async function renderNextBatch() {
 async function activateExplorerMode() {
   errorMessage.textContent = "";
   resultsTitle.textContent = "Lottas Empfehlungen fuer Dich";
-  recommendationPool = [];
-  currentOffset = 0;
-  nextRecommendationsButton.hidden = true;
+  recommendationPool = secretExplorerBooks;
+  currentOffset = 3;
   recommendations.innerHTML = "<li class=\"book-meta\">Buchschwarm wird gestartet...</li>";
   resultsInfo.textContent = "Easter Egg gefunden: Die Buecher sind unterwegs.";
   await runBookSwarm();
   recommendations.innerHTML = "<li class=\"book-meta\">Entdecker-Modus wird geladen...</li>";
-  await renderBooks(secretExplorerBooks);
-  resultsInfo.textContent = "Easter Egg gefunden: Entdecker-Modus (N-O-S-W) ist aktiv.";
+  const firstBatch = secretExplorerBooks.slice(0, 3);
+  await renderBooks(firstBatch);
+  
+  const hasMore = currentOffset < recommendationPool.length;
+  nextRecommendationsButton.hidden = !hasMore;
+  resultsInfo.textContent = hasMore
+    ? "Easter Egg gefunden: Entdecker-Modus (N-O-S-W) ist aktiv. Klick auf 'Mehr Vorschlaege anzeigen' fuer weitere Empfehlungen."
+    : "Easter Egg gefunden: Entdecker-Modus (N-O-S-W) ist aktiv.";
 }
 
 form.addEventListener("submit", async (event) => {
