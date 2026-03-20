@@ -271,6 +271,7 @@ const recommendations = document.getElementById("recommendations");
 const errorMessage = document.getElementById("error");
 const nextRecommendationsButton = document.getElementById("nextRecommendations");
 const resultsInfo = document.getElementById("resultsInfo");
+const resultsTitle = document.getElementById("resultsTitle");
 const fallbackCover = "https://placehold.co/180x270/f3e4c6/13212b?text=Kein+Cover";
 const easterEggSequence = ["N", "O", "S", "W"];
 const easterEggBookEmojis = ["📕", "📗", "📘", "📙", "📚"];
@@ -522,6 +523,7 @@ async function renderNextBatch() {
 
 async function activateExplorerMode() {
   errorMessage.textContent = "";
+  resultsTitle.textContent = "Lottas Empfehlungen fuer Dich";
   recommendationPool = [];
   currentOffset = 0;
   nextRecommendationsButton.hidden = true;
@@ -537,6 +539,7 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   errorMessage.textContent = "";
   resultsInfo.textContent = "";
+  resultsTitle.textContent = "Deine Vorschlaege";
   nextRecommendationsButton.hidden = true;
 
   const formData = new FormData(form);
